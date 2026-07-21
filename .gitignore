@@ -1,0 +1,22 @@
+.idea/
+.trae/
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Virtual env
+venv/
+.venv/
+
+# Chroma local vector DB
+data/
+
+# Reports
+docs/reports/*.json
+
+# OS
+.DS_Store
+Thumbs.db
