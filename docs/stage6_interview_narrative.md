@@ -58,10 +58,6 @@ flowchart TB
 4. **Eval 驱动**：run_experiments 对比 chunk/top_k
 5. **为什么没上 LangGraph**：当前路由 + Workflow 够用，手写 Loop 证明理解底层
 
-## 常见面试题速查
-
-见 [`interview_qa.md`](interview_qa.md)
-
 ## API 演示
 
 ```bash
