@@ -1,7 +1,7 @@
 # Agent 入门闯关（Python 版）
 
 这是一套「一个个能跑出结果的小脚本」，带你从零把个人 Agent 的核心能力玩一遍。
-每个脚本只做一件事，`python 文件名.py` 就能看到结果。现有的 TS 聊天界面先不动，最后一关再接回去。
+每个脚本只做一件事，`python 文件名.py` 就能看到结果。
 
 ## 成长路线图（面试导向）
 
@@ -117,4 +117,4 @@ python d2_store_chroma.py
 - `observe.py` / `rag_core.py` / `memory_store.py` / `pipeline.py` — 可复用模块
 - `mcp_helper.py` — 连 Notion MCP 的小助手
 - `data/` — 运行时数据（notes/chunks/向量库/记忆/数据库/eval 集）
-- `docs/` — 成长路线文档 + 面试材料
+- `docs/` — 成长路线文档
