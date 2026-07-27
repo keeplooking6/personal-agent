@@ -22,3 +22,4 @@ docs/reports/*.json
 Thumbs.db
 docs/qa.md
 docs/agent_入门闯关路线_704026f1.plan.md
+docs/decision/增量更新策略与面试问答.md
