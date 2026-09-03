@@ -23,7 +23,6 @@ DATA_DIR = Path(__file__).resolve().parent / "data"
 CHROMA_DIR = DATA_DIR / "chroma"
 COLLECTION = "notes"
 
-
 def _parse_args(argv: list[str]) -> tuple[str, int, str | None, str | None]:
     """解析命令行参数：question, top_k, note_type_filter, insight_type_filter。"""
     question = "语义检索能力的技术原理是什么"
@@ -47,7 +46,9 @@ def _parse_args(argv: list[str]) -> tuple[str, int, str | None, str | None]:
 def main() -> None:
     question, top_k, note_type_filter, insight_type_filter = _parse_args(sys.argv[1:])
 
+    # 这一行相当于 sqlite3.connect("notes.db")——只是打开/建立连接，没碰任何数据
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
+    # 写入时（d2）是 BGE 模型把笔记块算成向量存进去的；而查询时要把问题也转成向量，再到库里找最接近的
     collection = client.get_collection(COLLECTION, embedding_function=get_embedding_function())
 
     # 构造 where 条件
@@ -64,6 +65,7 @@ def main() -> None:
     print("query_kwargs",query_kwargs)
     if where:
         query_kwargs["where"] = where
+    #  返回结果会得到：原文+元数据+距离
     res = collection.query(**query_kwargs)
 
     filter_desc = ""

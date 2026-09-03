@@ -12,6 +12,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
 
+# 先加载项目根目录的 .env，再读环境变量（不覆盖已有的系统环境变量）
+load_dotenv()
+
 # 从环境变量读配置，读不到就用默认值（和现有项目保持一致）
 QWEN_BASE_URL = os.getenv("QWEN_BASE_URL", "")
 QWEN_MODEL = os.getenv("QWEN_MODEL", "")

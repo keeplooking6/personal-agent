@@ -56,6 +56,7 @@ resp = client.chat.completions.create(
 )
 msg = resp.choices[0].message
 
+# 由模型决定要不要调用工具，用哪个、传什么参数。
 if msg.tool_calls:
     # 模型决定调用工具了。把它的决定加进历史
     messages.append(msg)

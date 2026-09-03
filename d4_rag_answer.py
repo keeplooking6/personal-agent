@@ -1,8 +1,8 @@
 """
-D4 · 完整 RAG：检索你的笔记 + 让模型据此回答（带出处）
+D4 · 完整 RAG：检索笔记 + 让模型据此回答（带出处）
 
 运行：  python d4_rag_answer.py "我在学什么"
-        python d4_rag_answer.py "我在学什么" --top-k 5
+        python d4_rag_answer.py "我在学什么" --top-k 3
 前提：  先跑过 d2_store_chroma.py。
 该看到：模型基于你真实笔记内容作答，并标注答案来自哪几条笔记。
 

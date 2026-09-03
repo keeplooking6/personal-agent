@@ -5,8 +5,8 @@ D2 · 把笔记块存进向量库 Chroma
 前提：  先跑过 c3_chunk.py，已有 data/chunks.json。
 该看到：打印存入了多少个块，并在 data/chroma/ 生成本地向量库。
 
-Chroma 会自动帮你把每个块转成向量并存好（用的就是 D1 那个模型）。
-你只管把「文字 + 编号 + 附加信息」丢进去，检索的事它全包了。
+Chroma 会自动把每个块转成向量并存好（用的就是 D1 那个模型）。
+只管把「文字 + 编号 + 附加信息」丢进去，检索的事它全包了。
 
 P1 增强：复用 pipeline.store_chroma，metadata 自动携带
 note_type / insight_type / summary / tags，支持按类型过滤检索。

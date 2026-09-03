@@ -10,7 +10,7 @@ C1 · 把 Notion 笔记拉到本地，存成 notes.json
 
 模型驱动：不再硬编码搜索词和获取逻辑（旧版用 NOTION_SEARCH_QUERY + 遍历块），
     而是由模型根据用户需求自主决定使用什么工具、如何获取内容、何时完成。
-    如果连不上或找不到工具，会自动写入一份示例数据，保证你后面 D 关照样能练。
+    如果连不上或找不到工具，会自动写入一份示例数据，保证后面 D 关照样能练。
 """
 
 import argparse
@@ -71,6 +71,7 @@ def _simplify_schema(schema: dict) -> dict:
 
 
 def _tools_to_openai(mcp_tools: list) -> list:
+    """把 MCP 的工具描述，翻译成模型能看懂的 OpenAI 工具格式。"""
     out = []
     for t in mcp_tools:
         out.append({
@@ -160,7 +161,7 @@ async def pull_from_notion(user_query: str = "") -> list | None:
     if not selected:
         print("  [选择] 模型未选出工具，降级使用全部工具")
         selected = all_tools
-    print(f"  [选择] 模型已选 {len(selected)} 个工具")
+    print(f"  [选择] 模型已选 {len(selected)} 个工具，工具列表为：\n {selected}")
 
     # ── Phase 2: 浅层 agent 循环——只搜页面、不出完整内容 ──
     tool_defs = _tools_to_openai(selected)
@@ -183,16 +184,17 @@ async def pull_from_notion(user_query: str = "") -> list | None:
             await session.initialize()
 
             def _cull_context(msgs: list):
-                if len(msgs) <= 4:
+                """ 防止对话历史无限膨胀把模型上下文撑爆 """
+                if len(msgs) <= 4: # 消息很少时不用裁
                     return
-                keep = msgs[:2]
+                keep = msgs[:2] # 保留前 2 条：system + 用户最初的需求
                 tail = []
-                for m in reversed(msgs[2:]):
+                for m in reversed(msgs[2:]): # 从末尾往前扫
                     tail.append(m)
                     if m.get("role") == "assistant" and m.get("tool_calls"):
-                        break
-                tail.reverse()
-                msgs[:] = keep + tail
+                        break  # 扫到「最近一次发起工具调用的 assistant 消息」就停
+                tail.reverse() # 恢复正序
+                msgs[:] = keep + tail # 原地替换（不返回新列表）
 
             for step in range(MAX_STEPS):
                 _cull_context(messages)

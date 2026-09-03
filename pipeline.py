@@ -238,6 +238,7 @@ def _build_chroma_metadata(chunk: dict) -> dict:
 
 
 def store_chroma(chunks: list[dict] | None = None) -> int:
+    """将chunks.json中的内容入库"""
     import chromadb
 
     if chunks is None:
