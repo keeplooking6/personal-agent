@@ -38,7 +38,7 @@ pip install -r requirements.txt
 3. 初始化 RAG 数据（示例笔记已放在 `data/notes.json`）：
 
 ```bash
-# 先用 c4 打标签，再切块入库（c2/d2 自动读取 enriched 数据）
+# 先用 c2 打标签，再切块入库【将url取出单独存放、md格式去除】】
 python c2_summarize.py
 python c3_chunk.py
 python d2_store_chroma.py
