@@ -25,12 +25,14 @@ MCP_URL = os.getenv("MCP_URL", "")
 MCP_TOKEN = os.getenv("MCP_TOKEN", "")
 
 
-def get_client() -> OpenAI:
+def get_client(timeout: float | None = None, max_retries: int | None = None) -> OpenAI:
     """返回一个连到你 Qwen 的 OpenAI 兼容客户端。
 
     OpenAI 官方库能连任何「OpenAI 兼容」的服务，只要把 base_url 换成你的地址即可。
+    timeout / max_retries 可选：按脚本需要覆盖默认值（如关闭超时重试）。
     """
-    return OpenAI(base_url=QWEN_BASE_URL, api_key=QWEN_API_KEY)
+    return OpenAI(base_url=QWEN_BASE_URL, api_key=QWEN_API_KEY,
+                  timeout=timeout, max_retries=max_retries)
 
 
 # 关闭 Qwen3 的思考模式（简单对话更快）。这是 llama.cpp 的扩展参数。
