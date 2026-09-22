@@ -25,7 +25,7 @@ MCP_URL = os.getenv("MCP_URL", "")
 MCP_TOKEN = os.getenv("MCP_TOKEN", "")
 
 
-def get_client(timeout: float | None = None, max_retries: int | None = None) -> OpenAI:
+def get_client(timeout: float | None = None, max_retries: int = 0) -> OpenAI:
     """返回一个连到你 Qwen 的 OpenAI 兼容客户端。
 
     OpenAI 官方库能连任何「OpenAI 兼容」的服务，只要把 base_url 换成你的地址即可。
