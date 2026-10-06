@@ -19,6 +19,11 @@ COLLECTION = "notes"
 
 DEFAULT_TOP_K = 3
 
+# 渲染进提示词的链接长度上限。索引里的 urls 是建库时写进去的，
+# 万一索引是旧数据（曾经混进过 3000+ 字符的 S3 预签名链接），
+# 这里兜一道，别让元数据把提示词挤爆 —— 本地模型上下文只有 8192。
+MAX_URL_CHARS_IN_PROMPT = 300
+
 RAG_SYSTEM = (
     "你是基于用户笔记回答问题的助手。只能依据下面提供的资料回答，"
     "资料中没有的内容就直说『笔记里没有相关信息』，不要编造。"
@@ -68,8 +73,10 @@ def build_context(docs: list[str], metas: list[dict]) -> str:
     lines = []
     for i, (doc, meta) in enumerate(zip(docs, metas), 1):
         header = f"[资料{i}]（来自《{meta.get('title', '')}》）"
-        urls = meta.get("urls", "")
+        urls = meta.get("urls", "") or ""
         if urls:
+            if len(urls) > MAX_URL_CHARS_IN_PROMPT:
+                urls = urls[:MAX_URL_CHARS_IN_PROMPT] + "…"
             header += f"\n   链接：{urls}"
         lines.append(f"{header}\n{doc}")
     return "\n".join(lines)

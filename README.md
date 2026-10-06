@@ -54,7 +54,7 @@ python d2_store_chroma.py
 ### B 工具调用：让模型会用工具
 - `python b1_tool_manual.py` — 手动喂工具结果，看清「工具」本质
 - `python b2_tool_auto.py` — 模型自己决定调用函数（function calling）
-- `python b3_mcp_list_tools.py` — 连 Notion MCP，列出你有哪些工具
+- `python b3_mcp_list_tools.py` — 连 Notion MCP，列出你有哪些工具:mcp_tools.json文件相当于说明书
 - `python b4_mcp_query.py "问题"` — 模型自己用 Notion 工具查笔记（最小 Agent，含 trace）
 
 ### C 数据接入：把笔记搬到本地
