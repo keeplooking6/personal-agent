@@ -128,6 +128,40 @@ def summarize_note(note: dict) -> dict:
         return _fallback_enrichment(note)
 
 
+# 图片/附件类链接不进元数据。Notion 的 S3 预签名链接一条就有 1600+ 字符，
+# 而且带着 X-Amz-Credential / X-Amz-Security-Token 凭证 ——
+# 这些链接会被拼进每次检索的提示词，既挤爆本地模型的上下文（实测一个块
+# 背 3337 字符），又是把凭证往外送的隐患。
+_ASSET_URL_RE = re.compile(
+    r"\.(?:png|jpe?g|gif|webp|svg|bmp|ico|pdf|zip|mp4|mov)(?:$|[?#])", re.IGNORECASE
+)
+_PRESIGNED_RE = re.compile(r"[?&]X-Amz-(?:Signature|Credential|Security-Token)=", re.IGNORECASE)
+
+MAX_CITED_URLS = 3
+
+
+def extract_citable_urls(raw: str) -> str:
+    """从笔记正文里抽「能点回去看」的链接，返回逗号分隔的字符串。
+
+    只留页面链接：丢掉图片/附件链接（含 Notion 的 S3 预签名链接），
+    并统一去掉 query 和 fragment。
+    """
+    candidates = [url for _, url in re.findall(r"\[([^\]]*)\]\(([^)]+)\)", raw)]
+    candidates += re.findall(r"https?://[^\s)\"'>]+", raw)
+
+    kept: list[str] = []
+    for url in candidates:
+        if _ASSET_URL_RE.search(url) or _PRESIGNED_RE.search(url):
+            continue
+        url = url.split("#", 1)[0].split("?", 1)[0].rstrip("/")
+        if not url or url in kept:
+            continue
+        kept.append(url)
+        if len(kept) >= MAX_CITED_URLS:
+            break
+    return ",".join(kept)
+
+
 def strip_markdown_html(text: str) -> str:
     text = re.sub(r"<[^>]+>", " ", text)
     text = re.sub(r"!\[([^\]]*)\]\([^)]*\)", r"\1", text)
@@ -200,9 +234,7 @@ def build_chunks(chunk_size: int = 300, overlap: int = 50) -> list[dict]:
     chunks = []
     for note in notes:
         raw = note.get("text", "")
-        md_links = re.findall(r"\[([^\]]*)\]\(([^)]+)\)", raw)
-        bare_urls = re.findall(r"https?://[^\s)\"\'>]+", raw)
-        all_urls = list(set(url for _, url in md_links) | set(bare_urls))
+        urls = extract_citable_urls(raw)
         cleaned = strip_markdown_html(raw)
         for i, piece in enumerate(split_text(cleaned, chunk_size, overlap)):
             chunks.append(
@@ -215,7 +247,7 @@ def build_chunks(chunk_size: int = 300, overlap: int = 50) -> list[dict]:
                     "insight_type": note.get("insight_type") or "",
                     "summary": note.get("summary", ""),
                     "tags": note.get("tags", []),
-                    "urls": ",".join(all_urls) if all_urls else "",
+                    "urls": urls,
                 }
             )
     CHUNKS_FILE.write_text(json.dumps(chunks, ensure_ascii=False, indent=2), encoding="utf-8")
